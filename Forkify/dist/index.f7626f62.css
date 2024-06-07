@@ -127,7 +127,7 @@ body {
 
 .btn--inline:hover {
   color: #95f482;
-  background-color: #f2efee;
+  background-color: #e4ffe4;
 }
 
 .btn--inline:focus {
@@ -354,7 +354,7 @@ body {
 }
 
 .nav__btn:hover {
-  background-color: #f2efee;
+  background-color: #e4ffe4;
 }
 
 .bookmarks {
@@ -384,7 +384,7 @@ body {
 }
 
 .bookmarks__field:hover {
-  background-color: #f2efee;
+  background-color: #e4ffe4;
 }
 
 .bookmarks:hover, .nav__btn--bookmarks:hover + .bookmarks {
@@ -468,7 +468,7 @@ body {
 }
 
 .preview__user-generated {
-  background-color: #eeeae8;
+  background-color: #daffda;
   border-radius: 10rem;
   justify-content: center;
   align-items: center;
@@ -618,7 +618,7 @@ body {
 }
 
 .recipe__user-generated {
-  background-color: #eeeae8;
+  background-color: #daffda;
   border-radius: 10rem;
   justify-content: center;
   align-items: center;
@@ -636,7 +636,7 @@ body {
 }
 
 .recipe__ingredients {
-  background-color: #f2efee;
+  background-color: #e4ffe4;
   flex-direction: column;
   align-items: center;
   padding: 5rem 8rem;
