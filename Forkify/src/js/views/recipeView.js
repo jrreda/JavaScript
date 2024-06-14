@@ -13,6 +13,12 @@ class RecipeView {
         this.#parentElement.insertAdjacentHTML('afterbegin', markup);
     }
 
+    addHandlerRender(handler) {
+        // window.addEventListener('load', controlRecipes);
+        // window.addEventListener('hashchange', controlRecipes);
+        ['load', 'hashchange'].forEach(ev => window.addEventListener(ev, handler));
+    }
+
     #clear() {
         this.#parentElement.innerHTML = '';
     }
