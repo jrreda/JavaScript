@@ -607,6 +607,8 @@ const controlRecipes = async function() {
         const id = window.location.hash.slice(1);
         if (!id) return false;
         (0, _recipeViewDefault.default).renderSpenner();
+        // 0) Update results view to mark selected search result
+        (0, _resultsViewDefault.default).update(_model.getSearchResultsPage());
         // 1) Load the recipe
         await _model.loadRecipe(id);
         // 2) Render the recipe
@@ -623,7 +625,6 @@ const controlSearchResults = async function() {
         // 2) Load search results
         await _model.loadSearchResults(query);
         // 3) Render the results
-        // resultsView.render(model.state.search.results);
         (0, _resultsViewDefault.default).render(_model.getSearchResultsPage());
         // 4) Render the pagination buttons
         (0, _paginationViewDefault.default).render(_model.state.search);
@@ -637,8 +638,15 @@ const controlPagination = function(goToPage) {
     // 2) Render NEW pagination buttons
     (0, _paginationViewDefault.default).render(_model.state.search);
 };
+const controlServings = function(newServings) {
+    // 1) update the recipe servings (in state)
+    _model.updateServinsg(newServings);
+    // 2) Update (! reRender) the recipe View
+    (0, _recipeViewDefault.default).update(_model.state.recipe);
+};
 const init = function() {
     (0, _recipeViewDefault.default).addHandlerRender(controlRecipes);
+    (0, _recipeViewDefault.default).addHandlerUpdateServings(controlServings);
     (0, _searchViewDefault.default).addHandlerSearch(controlSearchResults);
     (0, _paginationViewDefault.default).addHandlerClick(controlPagination);
 };
@@ -1884,6 +1892,7 @@ parcelHelpers.export(exports, "state", ()=>state);
 parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
 parcelHelpers.export(exports, "loadSearchResults", ()=>loadSearchResults);
 parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage);
+parcelHelpers.export(exports, "updateServinsg", ()=>updateServinsg);
 var _config = require("./config");
 var _helpers = require("./helpers");
 const state = {
@@ -1936,6 +1945,12 @@ const getSearchResultsPage = function(page = state.search.page) {
     const start = (page - 1) * state.search.resultsPerPage;
     const end = page * state.search.resultsPerPage;
     return state.search.results.slice(start, end);
+};
+const updateServinsg = function(newServings) {
+    state.recipe.ingredients.forEach((ing)=>{
+        ing.quantity = ing.quantity * (newServings / state.recipe.servings);
+    });
+    state.recipe.servings = newServings;
 };
 
 },{"./config":"k5Hzs","./helpers":"hGI1E","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"k5Hzs":[function(require,module,exports) {
@@ -2610,6 +2625,14 @@ class RecipeView extends (0, _viewDefault.default) {
             "hashchange"
         ].forEach((ev)=>window.addEventListener(ev, handler));
     }
+    addHandlerUpdateServings(handler) {
+        this._parentElement.addEventListener("click", function(e) {
+            const btn = e.target.closest(".btn--update-servings");
+            if (!btn) return;
+            const updateTo = +btn.dataset.updateTo;
+            if (updateTo > 0) handler(updateTo);
+        });
+    }
     _generateMarkup() {
         return `
             <figure class="recipe__fig">
@@ -2635,12 +2658,12 @@ class RecipeView extends (0, _viewDefault.default) {
                     <span class="recipe__info-text">servings</span>
 
                     <div class="recipe__info-buttons">
-                        <button class="btn--tiny btn--increase-servings">
+                        <button data-update-to=${this._data.servings - 1} class="btn--tiny btn--update-servings">
                             <svg>
                                 <use href="${0, _iconsSvgDefault.default}.svg#icon-minus-circle"></use>
                             </svg>
                         </button>
-                        <button class="btn--tiny btn--increase-servings">
+                        <button data-update-to=${this._data.servings + 1} class="btn--tiny btn--update-servings">
                             <svg>
                                 <use href="${0, _iconsSvgDefault.default}.svg#icon-plus-circle"></use>
                             </svg>
@@ -3004,6 +3027,29 @@ class View {
         this._clear();
         this._parentElement.insertAdjacentHTML("afterbegin", markup);
     }
+    render(data) {
+        if (!data || Array.isArray(data) && data.length === 0) return this.renderError();
+        this._data = data;
+        const markup = this._generateMarkup();
+        this._clear();
+        this._parentElement.insertAdjacentHTML("afterbegin", markup);
+    }
+    update(data) {
+        this._data = data;
+        const newMarkup = this._generateMarkup();
+        const newDOM = document.createRange().createContextualFragment(newMarkup);
+        const newElements = Array.from(newDOM.querySelectorAll("*"));
+        const currentElements = Array.from(this._parentElement.querySelectorAll("*"));
+        newElements.forEach((newElement, i)=>{
+            const currentElement = currentElements[i];
+            // Update changed TEXT
+            if (!newElement.isEqualNode(currentElement) && newElement.firstChild.nodeValue.trim() !== "") currentElement.textContent = newElement.textContent;
+            // Update changed ATTRIBUTES
+            if (!newElement.isEqualNode(currentElement)) Array.from(newElement.attributes).forEach((attr)=>{
+                currentElement.setAttribute(attr.name, attr.value);
+            });
+        });
+    }
     _clear() {
         this._parentElement.innerHTML = "";
     }
@@ -3086,9 +3132,10 @@ class ResultsView extends (0, _viewDefault.default) {
         return this._data.map(this._generateMarkupPreview).join("");
     }
     _generateMarkupPreview(result) {
+        const id = window.location.hash.slice(1);
         return `
             <li class="preview">
-                <a class="preview__link" href="#${result.id}">
+                <a class="preview__link ${result.id === id ? "preview__link--active" : ""}" href="#${result.id}">
                     <figure class="preview__fig">
                         <img src="${result.image}" alt="${result.title}">
                     </figure>
