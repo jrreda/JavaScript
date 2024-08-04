@@ -19,12 +19,22 @@ class RecipeView extends View {
             if (!btn) return;
 
             const updateTo = +btn.dataset.updateTo;
-            
+
             if (updateTo > 0) handler(updateTo);
         });
     }
 
+    addHandlerAddBookmark(handler) {
+        this._parentElement.addEventListener('click', function(e) {
+            const btn = e.target.closest('.btn--bookmark');
+            if (!btn) return;
+
+            handler();
+        });
+    }
+
     _generateMarkup() {
+        console.log(this._data);
         return `
             <figure class="recipe__fig">
                 <img src="${this._data.image}" alt="${this._data.title}" class="recipe__img">
@@ -65,9 +75,9 @@ class RecipeView extends View {
                 <div class="recipe__user-generated">
 
                 </div>
-                <button class="btn--round">
-                    <svg class="">
-                        <use href="${icons}.svg#icon-bookmark-fill"></use>
+                <button class="btn--round btn--bookmark">
+                    <svg>
+                        <use href="${icons}.svg#icon-bookmark${this._data.bookmarked ? '-fill' : ''}"></use>
                     </svg>
                 </button>
             </div>
