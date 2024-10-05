@@ -18,10 +18,10 @@ import { async } from "regenerator-runtime";
 // }
 
 ///////////////////////////////////////
-const controlRecipes = async function() {
+const controlRecipes = async function () {
     try {
         const id = window.location.hash.slice(1);
-        if (!id) return false;
+        if (!id) return;
 
         recipeView.renderSpinner();
 
@@ -41,7 +41,7 @@ const controlRecipes = async function() {
     }
 };
 
-const controlSearchResults = async function() {
+const controlSearchResults = async function () {
     try {
         // 1) Get the query from the view
         const query = searchView.getQuery();
@@ -58,7 +58,7 @@ const controlSearchResults = async function() {
     } catch (error) {
         console.error(error);
     }
-}
+};
 
 const controlPagination = function (goToPage) {
     // 1) Render NEW results
@@ -66,7 +66,7 @@ const controlPagination = function (goToPage) {
 
     // 2) Render NEW pagination buttons
     paginationView.render(model.state.search);
-}
+};
 
 const controlServings = function (newServings) {
         // 1) update the recipe servings (in state)
@@ -76,7 +76,7 @@ const controlServings = function (newServings) {
         recipeView.update(model.state.recipe);
 };
 
-const controlAddBookmarks = function () {
+const controlAddBookmark = function () {
     if (! model.state.recipe.bookmarked) {
         // Add new bookmark
         model.addBookmark(model.state.recipe);
@@ -122,7 +122,7 @@ const controlAddRecipe = async function (newRecipe) {
             addRecipeView.toggleWindow();
         }, MODAL_CLOSE_SEC * 1000);
     } catch (error) {
-        console.error('***', error);
+        console.error('💥', error);
         addRecipeView.renderError(error.message);
     }
 };
@@ -131,7 +131,7 @@ const init = function () {
     bookmarksView.addHandlerRender(controlBookmarks);
     recipeView.addHandlerRender(controlRecipes);
     recipeView.addHandlerUpdateServings(controlServings);
-    recipeView.addHandlerAddBookmark(controlAddBookmarks);
+    recipeView.addHandlerAddBookmark(controlAddBookmark);
     searchView.addHandlerSearch(controlSearchResults);
     paginationView.addHandlerClick(controlPagination);
     addRecipeView.addHandlerUpload(controlAddRecipe);

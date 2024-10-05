@@ -4,7 +4,7 @@ import View from "./View";
 
 class RecipeView extends View {
     _parentElement = document.querySelector('.recipe');
-    _errorMessage = 'We <couldn\'t find that recipe. Please try another one!';
+    _errorMessage = 'We couldn\'t find that recipe. Please try another one!';
     _successMessage = '';
 
     addHandlerRender(handler) {
@@ -14,18 +14,18 @@ class RecipeView extends View {
     }
 
     addHandlerUpdateServings(handler) {
-        this._parentElement.addEventListener('click', function(e) {
+        this._parentElement.addEventListener('click', function (e) {
             const btn = e.target.closest('.btn--update-servings');
             if (!btn) return;
 
-            const updateTo = +btn.dataset.updateTo;
+            const { updateTo } = +btn.dataset;
 
             if (updateTo > 0) handler(updateTo);
         });
     }
 
     addHandlerAddBookmark(handler) {
-        this._parentElement.addEventListener('click', function(e) {
+        this._parentElement.addEventListener('click', function (e) {
             const btn = e.target.closest('.btn--bookmark');
             if (!btn) return;
 
@@ -34,7 +34,6 @@ class RecipeView extends View {
     }
 
     _generateMarkup() {
-        console.log(this._data);
         return `
             <figure class="recipe__fig">
                 <img src="${this._data.image}" alt="${this._data.title}" class="recipe__img">

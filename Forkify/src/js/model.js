@@ -25,7 +25,7 @@ const createRecipeObject = function (data) {
         servings   : recipe.servings,
         cookingTime: recipe.cooking_time,
         ingredients: recipe.ingredients,
-        ...(recipe.key && { key: recipe.key}),
+        ...(recipe.key && { key: recipe.key }),
     }
 }
 
@@ -40,7 +40,7 @@ export const loadRecipe = async function (id) {
             state.recipe.bookmarked = false;
         }
     } catch (error) {
-        console.error(`${error} ++++++`);
+        console.error(`${error} 💥💥💥💥`);
         throw error;
     }
 };
@@ -64,7 +64,7 @@ export const loadSearchResults = async function (query) {
         // reset page number
         state.search.page = 1;
     } catch (error) {
-        console.error(`${error} *****`);
+        console.error(`${error} 💥💥💥💥`);
         throw error;
     }
 };
@@ -72,15 +72,15 @@ export const loadSearchResults = async function (query) {
 export const getSearchResultsPage = function (page = state.search.page) {
     state.search.page = page;
 
-    const start = (page - 1) * state.search.resultsPerPage;
-    const end   = page * state.search.resultsPerPage;
+    const start = (page - 1) * state.search.resultsPerPage; // 0
+    const end   = page * state.search.resultsPerPage;       // 9
 
     return state.search.results.slice(start, end);
 };
 
 export const updateServinsg = function (newServings) {
     state.recipe.ingredients.forEach(ing => {
-        ing.quantity = ing.quantity * (newServings / state.recipe.servings);
+        ing.quantity = (ing.quantity * newServings) / state.recipe.servings;
     });
 
     state.recipe.servings = newServings;
@@ -91,7 +91,7 @@ const persistBookmarks = function () {
 };
 
 export const addBookmark = function (recipe) {
-    // Add a bookmark
+    // Add bookmark
     state.bookmarks.push(recipe);
 
     // Mark current recipe as bookmarked
@@ -113,12 +113,7 @@ export const deleteBookmark = function (id) {
     persistBookmarks();
 };
 
-const clearBookmark = function() {
-    localStorage.clear('bookmarks');
-};
-// clearBookmark();
-
-export const uploadRecipe = async function(newRecipe) {
+export const uploadRecipe = async function (newRecipe) {
     try {
         const ingredients = Object.entries(newRecipe)
             .filter(entry => entry[0].startsWith('ingredient') && entry[1] !== '')
@@ -154,8 +149,13 @@ export const uploadRecipe = async function(newRecipe) {
     }
 };
 
-const init = function() {
+const init = function () {
     const storage = localStorage.getItem('bookmarks');
     if (storage) state.bookmarks = JSON.parse(storage);
 };
 init();
+
+const clearBookmark = function () {
+    localStorage.clear('bookmarks');
+};
+// clearBookmark();
